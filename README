@@ -1,19 +1,25 @@
-Linux kernel
-============
+This fork introduces enhancements to the Linux 4.17 kernel, enabling the counting of physically and virtually contiguous pages.
+Additionally, it facilitates adjusting the number of pages allocated per page fault. 
+These modifications aim to optimize allocation efficiency by allowing applications to tune the allocation per fault, thereby reducing context-switching costs.
 
-There are several guides for kernel developers and users. These guides can
-be rendered in a number of formats, like HTML and PDF. Please read
-Documentation/admin-guide/README.rst first.
+Usage:
 
-In order to build the documentation, use ``make htmldocs`` or
-``make pdfdocs``.  The formatted documentation can also be read online at:
+Once the modifed kernel has been loaded, a custom sys call needs to be called before an application modifies allocations.
+To call the syscall, add the following function definition. 
 
-    https://www.kernel.org/doc/html/latest/
+```
+#define __NR_identity 333
 
-There are various text files in the Documentation/ subdirectory,
-several of them using the Restructured Text markup notation.
-See Documentation/00-INDEX for a list of what is contained in each file.
+long identity_syscall(unsigned long count)
+{
+    return syscall(__NR_identity, count);
+}
+```
+call pass count of allocation per fault to identity_syscall before execution of your application and pass 0 right after execution is complete.
 
-Please read the Documentation/process/changes.rst file, as it contains the
-requirements for building and running the kernel, and information about
-the problems which may result by upgrading your kernel.
+The number of contiguous segments of memory used is tracked by maintaining a red-black tree within the kernel. The count and size of these segments are logged using printk. To view these make sure to run
+```
+dmesg -n 5
+```
+
+
