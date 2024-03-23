@@ -760,6 +760,19 @@ static inline void dequeue_task(struct rq *rq, struct task_struct *p, int flags)
 	p->sched_class->dequeue_task(rq, p, flags);
 }
 
+void make_inactive(unsigned int flag, pid_t tgid) {
+	reweight_task(current, 39);
+}
+
+
+
+unsigned int enable_coop = 0;
+SYSCALL_DEFINE2(enable_coop_sched, unsigned int, flag, int, tgid) {
+	// printk("in new sys call");
+	make_inactive(flag, tgid);
+	return 0;
+}
+
 void activate_task(struct rq *rq, struct task_struct *p, int flags)
 {
 	if (task_contributes_to_load(p))

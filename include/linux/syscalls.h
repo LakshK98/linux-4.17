@@ -1269,5 +1269,6 @@ static inline long ksys_truncate(const char __user *pathname, loff_t length)
 }
 
 asmlinkage long sys_set_personal_flag(unsigned long flag); 
+asmlinkage long sys_enable_coop_sched(unsigned int flag, int tgid);
 
 #endif
